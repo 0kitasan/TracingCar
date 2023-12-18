@@ -103,18 +103,19 @@ public:
     pinMode(B_PWM, OUTPUT);  // 全部都设置为输出
     servo.attach(servo_pwm_pin);
   }
-  void run_Motor(const int speed_mode) {
+  void run_Motor(const int A_speed, const int B_speed) {
     //注意电机旋转方向,两者可能不一致
-    A_Motor(LOW, speed_mode);
-    B_Motor(HIGH, speed_mode);
+    //转向时使AB电机转速不同以辅助转向
+    A_Motor(LOW, A_speed);
+    B_Motor(HIGH, B_speed);
   }
 
   void angle_loop(float times) {
     float angle = 0;
-    const float angle_start=60;
-    const float angle_end=140;
+    const float angle_start = 60;
+    const float angle_end = 140;
     for (int i = 0; i <= times; i++) {
-      angle = angle_start+i*(angle_end-angle_start)/times;
+      angle = angle_start + i * (angle_end - angle_start) / times;
       servo.write(angle);
       Serial.print("angle");
       Serial.print(i);
@@ -125,18 +126,18 @@ public:
     }
   }
 
-  void turn_ctrl(const int speed, const int angle) {
-    run_Motor(speed);
+  void turn_ctrl(const int A_speed, const int B_speed, const int angle) {
+    run_Motor(A_speed, B_speed);
     servo.write(offset + angle);
   }
 
   void straight() {
-    run_Motor(straight_speed);
+    run_Motor(straight_speed, straight_speed);
     servo.write(offset);
   }
 
   void stop() {
-    run_Motor(0);
+    run_Motor(0, 0);
     servo.write(offset);
   }
 };
@@ -154,52 +155,60 @@ public:
     //此函数中只考虑检测正确的情况
     const int L = -1;
     const int R = 1;
+    //右转，角度需要大一点
+    const int A_speed_0to3[4]={30,85,95,105};
+    const int B_speed_0to3[4]={30,85,95,105};
+    const int angle_0to3[4]={62,50,45,35};
+    //左转，角度需要大一点
+    const int A_speed_5to8[4]={30,85,95,105};
+    const int B_speed_5to8[4]={30,85,95,105};
+    const int angle_5to8[4]={38,28,18,8};
     switch (state) {
       case 0:
         //0,黑线在右，需左转
         //其实是黑线在左，需要右转
         //这里把速度也调慢了
-        Motor::turn_ctrl(30, L * 62);
+        Motor::turn_ctrl(A_speed_0to3[0],B_speed_0to3[0], L * angle_0to3[0]);
         last_status = 0;
         break;
       case 1:
         //0.5,黑线在右，需左转
-        Motor::turn_ctrl(85, L * 50);
+        Motor::turn_ctrl(A_speed_0to3[1],B_speed_0to3[1], L * angle_0to3[1]);
         last_status = 1;
         break;
       case 2:
         //1,黑线在右，需左转
-        Motor::turn_ctrl(95, L * 45);
+        Motor::turn_ctrl(A_speed_0to3[2],B_speed_0to3[2], L * angle_0to3[2]);
         last_status = 2;
         break;
       case 3:
         //1.5,黑线在右，需左转
-        Motor::turn_ctrl(105, L * 35);
+        Motor::turn_ctrl(A_speed_0to3[3],B_speed_0to3[3], L * angle_0to3[3]);
         last_status = 3;
         break;
       case 4:
         //2,黑线在中
-        Motor::turn_ctrl(115, 0);
+        Motor::turn_ctrl(115, 115, 0);
         last_status = 4;
         break;
       case 5:
         //2.5,黑线在左，需右转
-        Motor::turn_ctrl(105, R * 8);
+        Motor::turn_ctrl(A_speed_5to8[3],B_speed_5to8[3], R * angle_5to8[3]);
         last_status = 5;
         break;
       case 6:
         //3,黑线在左，需右转
-        Motor::turn_ctrl(95, R * 18);
+        Motor::turn_ctrl(A_speed_5to8[2],B_speed_5to8[2], R * angle_5to8[2]);
         last_status = 6;
         break;
       case 7:
         //3.5,黑线在左，需右转
-        Motor::turn_ctrl(85, R * 28);
+        Motor::turn_ctrl(A_speed_5to8[1],B_speed_5to8[1], R * angle_5to8[1]);
         last_status = 7;
         break;
       case 8:
         //4,黑线在左，需右转
-        Motor::turn_ctrl(75, R * 38);
+        Motor::turn_ctrl(A_speed_5to8[0],B_speed_5to8[0], R * angle_5to8[0]);
         last_status = 8;
         break;
     }
