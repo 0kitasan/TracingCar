@@ -15,7 +15,7 @@ private:
       Serial.print('-');
 
       if (sensorReading[i] < threshold) {
-        //小于阈值，则黑线在灰度传感器下方，result为1
+        // 小于阈值，则黑线在灰度传感器下方，result为1
         sensor_result[i] = 1;
         cnt++;
       } else {
@@ -30,11 +30,15 @@ private:
     }
     Serial.println();
 
-    if (cnt == 0 || cnt > 2) { flag = -1; }
-    //未检测到黑线或者有3个以上的黑线
+    if (cnt == 0 || cnt > 2) {
+      flag = -1;
+    }
+    // 未检测到黑线或者有3个以上的黑线
     if (cnt == 1) {
       for (int i = 0; i < 5; i++) {
-        if (sensor_result[i]) { position = i; }
+        if (sensor_result[i]) {
+          position = i;
+        }
       }
       flag = 1;
     }
@@ -50,10 +54,11 @@ private:
         flag = 1;
       } else {
         flag = -1;
-        //如果不相邻，则报错
+        // 如果不相邻，则报错
       }
     }
   }
+
 public:
   float getStatus() {
     read();
@@ -104,8 +109,8 @@ public:
     servo.attach(servo_pwm_pin);
   }
   void run_Motor(const int A_speed, const int B_speed) {
-    //注意电机旋转方向,两者可能不一致
-    //转向时使AB电机转速不同以辅助转向
+    // 注意电机旋转方向,两者可能不一致
+    // 转向时使AB电机转速不同以辅助转向
     A_Motor(LOW, A_speed);
     B_Motor(HIGH, B_speed);
   }
@@ -126,8 +131,8 @@ public:
     }
   }
 
-  void turn_ctrl(const int A_speed, const int B_speed, const int angle) {
-    run_Motor(A_speed, B_speed);
+  void turn_ctrl(const int ave_speed, const int diff, const int angle) {
+    run_Motor(ave_speed + diff, ave_speed - diff);
     servo.write(offset + angle);
   }
 
@@ -151,67 +156,69 @@ public:
   }
 
   void tracing_adjust(int state) {
-    //分段调控
-    //此函数中只考虑检测正确的情况
+    // 分段调控
+    // 此函数中只考虑检测正确的情况
     const int L = -1;
     const int R = 1;
-    //右转，角度需要大一点
-    const int A_speed_0to3[4] = { 10, 85, 103, 115 };
-    //A右轮，B左轮
-    const int B_speed_0to3[4] = { 95, 100, 107, 115 };
+    // 右转，角度需要大一点
+    const int ave_speed_0to3[4] = { 50, 90, 105, 115 };
+    // A_Motor为右轮，B_Motor为左轮
+    //diff为正，右轮速度>左轮速度
+    //diff为负，右轮速度<左轮速度
+    const int diff_0to3[4] = { -40, -10, -2, 0 };
     const int angle_0to3[4] = { 58, 51, 43, 33 };
-    //左转，角度需要大一点
-    const int A_speed_5to8[4] = { 85, 100, 107, 115 };
-    const int B_speed_5to8[4] = { 45, 85, 103, 115 };
+    // 左转，角度需要大一点
+    const int ave_speed_5to8[4] = { 65, 90, 105, 115 };
+    const int diff_5to8[4] = { 20, 10, 2, 115 };
     const int angle_5to8[4] = { 39, 29, 19, 9 };
-    //直行时，调试时可以用来测试差速，调试结束后记得消除差速
-    const int STR[2] = { 123, 123 };
+    // 直行时，调试时可以用来测试差速，调试结束后记得消除差速
+    const int STR[2] = { 123, 0 };
     switch (state) {
       case 0:
-        //0,黑线在右，需左转
-        //其实是黑线在左，需要右转
-        //这里把速度也调慢了
-        Motor::turn_ctrl(A_speed_0to3[0], B_speed_0to3[0], L * angle_0to3[0]);
+        // 0,黑线在右，需左转
+        // 其实是黑线在左，需要右转
+        // 这里把速度也调慢了
+        Motor::turn_ctrl(ave_speed_0to3[0], diff_0to3[0], L * angle_0to3[0]);
         last_status = 0;
         break;
       case 1:
-        //0.5,黑线在右，需左转
-        Motor::turn_ctrl(A_speed_0to3[1], B_speed_0to3[1], L * angle_0to3[1]);
+        // 0.5,黑线在右，需左转
+        Motor::turn_ctrl(ave_speed_0to3[1], diff_0to3[1], L * angle_0to3[1]);
         last_status = 1;
         break;
       case 2:
-        //1,黑线在右，需左转
-        Motor::turn_ctrl(A_speed_0to3[2], B_speed_0to3[2], L * angle_0to3[2]);
+        // 1,黑线在右，需左转
+        Motor::turn_ctrl(ave_speed_0to3[2], diff_0to3[2], L * angle_0to3[2]);
         last_status = 2;
         break;
       case 3:
-        //1.5,黑线在右，需左转
-        Motor::turn_ctrl(A_speed_0to3[3], B_speed_0to3[3], L * angle_0to3[3]);
+        // 1.5,黑线在右，需左转
+        Motor::turn_ctrl(ave_speed_0to3[3], diff_0to3[3], L * angle_0to3[3]);
         last_status = 3;
         break;
       case 4:
-        //2,黑线在中
+        // 2,黑线在中
         Motor::turn_ctrl(STR[0], STR[1], 2);
         last_status = 4;
         break;
       case 5:
-        //2.5,黑线在左，需右转
-        Motor::turn_ctrl(A_speed_5to8[3], B_speed_5to8[3], R * angle_5to8[3]);
+        // 2.5,黑线在左，需右转
+        Motor::turn_ctrl(ave_speed_5to8[3], diff_5to8[3], R * angle_5to8[3]);
         last_status = 5;
         break;
       case 6:
-        //3,黑线在左，需右转
-        Motor::turn_ctrl(A_speed_5to8[2], B_speed_5to8[2], R * angle_5to8[2]);
+        // 3,黑线在左，需右转
+        Motor::turn_ctrl(ave_speed_5to8[2], diff_5to8[2], R * angle_5to8[2]);
         last_status = 6;
         break;
       case 7:
-        //3.5,黑线在左，需右转
-        Motor::turn_ctrl(A_speed_5to8[1], B_speed_5to8[1], R * angle_5to8[1]);
+        // 3.5,黑线在左，需右转
+        Motor::turn_ctrl(ave_speed_5to8[1], diff_5to8[1], R * angle_5to8[1]);
         last_status = 7;
         break;
       case 8:
-        //4,黑线在左，需右转
-        Motor::turn_ctrl(A_speed_5to8[0], B_speed_5to8[0], R * angle_5to8[0]);
+        // 4,黑线在左，需右转
+        Motor::turn_ctrl(ave_speed_5to8[0], diff_5to8[0], R * angle_5to8[0]);
         last_status = 8;
         break;
     }
@@ -224,7 +231,7 @@ public:
     if (state != -2) {
       tracing_adjust(state);
     } else {
-      //处理错误情况
+      // 处理错误情况
       tracing_adjust(last_status);
     }
   }
@@ -237,10 +244,10 @@ public:
     const int L = -1;
     const int R = 1;
     Motor::turn_ctrl(75, 75, L * 25);
-    //向右转，输入-参数
+    // 向右转，输入-参数
     delay(1500);
     Motor::turn_ctrl(75, 75, R * 115);
-    //向左转，输入+参数
+    // 向左转，输入+参数
     delay(3000);
   }
 
@@ -250,7 +257,7 @@ public:
 
   void motor_direction() {
     Motor::turn_ctrl(120, 30, 0);
-    //120右轮
-    //30左轮
+    // 120右轮
+    // 30左轮
   }
 };
