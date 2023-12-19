@@ -156,16 +156,16 @@ public:
     const int L = -1;
     const int R = 1;
     //右转，角度需要大一点
-    const int A_speed_0to3[4] = { 30, 85, 95, 110 };
+    const int A_speed_0to3[4] = { 10, 85, 103, 115 };
     //A右轮，B左轮
-    const int B_speed_0to3[4] = { 95, 95, 100, 110 };
-    const int angle_0to3[4] = { 62, 52, 45, 35 };
+    const int B_speed_0to3[4] = { 95, 100, 107, 115 };
+    const int angle_0to3[4] = { 58, 51, 43, 33 };
     //左转，角度需要大一点
-    const int A_speed_5to8[4] = { 80, 95, 100, 110 };
-    const int B_speed_5to8[4] = { 65, 85, 95, 110 };
+    const int A_speed_5to8[4] = { 85, 100, 107, 115 };
+    const int B_speed_5to8[4] = { 45, 85, 103, 115 };
     const int angle_5to8[4] = { 39, 29, 19, 9 };
     //直行时，调试时可以用来测试差速，调试结束后记得消除差速
-    const int STR[2] = { 115, 115 };
+    const int STR[2] = { 123, 123 };
     switch (state) {
       case 0:
         //0,黑线在右，需左转
