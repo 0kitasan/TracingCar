@@ -1,7 +1,7 @@
 #include <Servo.h>
 class Sensor {
 private:
-  const int sensor[5] = { A0, A1, A2, A3, A4 };
+  const int sensor[5] = {A0, A1, A2, A3, A4};
   const int threshold = 450;
   int sensorReading[5];
   int flag = 0;
@@ -62,27 +62,28 @@ private:
 public:
   float getStatus() {
     read();
-    if (flag == -1)
+    if (flag == -1) {
       return -1;
-    else
+    } else {
       return position;
+    }
   }
 };
 
 class Motor {
 private:
   // A组电机驱动
-  const int A_PWM = 6;  // 控制速度
-  const int A_DIR = 7;  // 控制方向
+  const int A_PWM = 6; // 控制速度
+  const int A_DIR = 7; // 控制方向
   // B组电机驱动
-  const int B_PWM = 5;  // 控制速度
-  const int B_DIR = 4;  // 控制方向
+  const int B_PWM = 5; // 控制速度
+  const int B_DIR = 4; // 控制方向
 
   const int servo_pwm_pin = 9;
 
-  const int offset = 83;  // 舵机的零点
+  const int offset = 140; // 舵机的零点
 
-  //在这辆小车上，默认A：LOW，B：HIGH
+  // 在这辆小车上，默认A：LOW，B：HIGH
   const int dir_A = 0;
   const int dir_B = 1;
   Servo servo;
@@ -104,10 +105,11 @@ public:
     pinMode(A_DIR, OUTPUT);
     pinMode(A_PWM, OUTPUT);
     pinMode(B_DIR, OUTPUT);
-    pinMode(B_PWM, OUTPUT);  // 全部都设置为输出
+    pinMode(B_PWM, OUTPUT); // 全部都设置为输出
     servo.attach(servo_pwm_pin);
   }
-  void run_Motor(const int A_speed, const int B_speed, const int dir_A, const int dir_B) {
+  void run_Motor(const int A_speed, const int B_speed, const int dir_A,
+                 const int dir_B) {
     // 注意电机旋转方向,两者可能不一致
     // 转向时使AB电机转速不同以辅助转向
     A_Motor(dir_A, A_speed);
@@ -116,8 +118,8 @@ public:
 
   void angle_loop(float times) {
     float angle = 0;
-    const float angle_start = 60;
-    const float angle_end = 140;
+    const float angle_start = 0;
+    const float angle_end = 120;
     for (int i = 0; i <= times; i++) {
       angle = angle_start + i * (angle_end - angle_start) / times;
       servo.write(angle);
@@ -130,22 +132,27 @@ public:
     }
   }
 
-  void turn_ctrl(const int ave_speed, const int diff, const int angle, int mode) {
+  void turn_ctrl(const int Aspeed, const int Bspeed, const int angle,
+                 int mode) {
     servo.write(offset + angle);
     // 在这辆车上，A是右轮，B是左轮
     switch (mode) {
-      case 0:
-        //默认模式
-        run_Motor(ave_speed + diff, ave_speed - diff, dir_A, dir_B);
-        break;
-      case 1:
-        //极限左转，左电机反转
-        run_Motor(ave_speed + diff, ave_speed - diff, dir_A, !dir_B);
-        break;
-      case 2:
-        //极限右转，右电机反转
-        run_Motor(ave_speed + diff, ave_speed - diff, !dir_A, dir_B);
-        break;
+    case 0:
+      // 默认模式
+      run_Motor(Aspeed, Bspeed, dir_A, dir_B);
+      break;
+    case 1:
+      // 极限左转，左电机反转
+      run_Motor(Aspeed, Bspeed, dir_A, !dir_B);
+      break;
+    case 2:
+      // 极限右转，右电机反转
+      run_Motor(Aspeed, Bspeed, !dir_A, dir_B);
+      break;
+    case 3:
+      // 倒车(试验)
+      run_Motor(Aspeed, Bspeed, !dir_A, !dir_B);
+      break;
     }
   }
 
@@ -164,76 +171,72 @@ class Car : private Sensor, private Motor {
 public:
   int last_status = 4;
 
-  void start() {
-    Motor::init();
-  }
+  void start() { Motor::init(); }
 
   void tracing_adjust(int state) {
-    //分段调控函数，这里只考虑检测正确的情况
-    const int L = -1;
-    const int R = 1;
-    // 右转，角度需要大一点
-    const int ave_speed_0to3[4] = { 110, 110, 130, 150 };
+    // 分段调控函数，这里只考虑检测正确的情况
+    const int R = -1;
+    const int L = 1;
+    // 12/25换了新舵机，好像角度不一样
     // A_Motor为右轮，B_Motor为左轮
-    //diff为正，右轮速度>左轮速度
-    //diff为负，右轮速度<左轮速度
-    const int diff_0to3[4] = { -60, -35, -15, -10 };
-    const int angle_0to3[4] = { 52, 45, 35, 25 };
-    // 上面是右转，角度需要大一点，但是最大别超过52了，以免损伤舵机
-    const int ave_speed_5to8[4] = { 95, 110, 130, 150 };
-    const int diff_5to8[4] = { 60, 37, 10, 5 };
-    const int angle_5to8[4] = { 37, 27, 17, 7 };
-    // 直行时，调试时可以用来测试差速，调试结束后记得消除差速
-    const int STR[2] = { 180, 0 };
-    //电机最大速度可以到250
+    const int Aspeed_0to3[4] = {50, 50, 100, 130};
+    const int Bspeed_0to3[4] = {140, 130, 140, 150};
+    const int angle_0to3[4] = {68, 50, 38, 28};
+    // 上面是右转，角度需要大一点，但是最大别超过54了，以免损伤舵机
+
+    const int Aspeed_5to8[4] = {105, 120, 135, 155};
+    const int Bspeed_5to8[4] = {95, 100, 120, 130};
+    const int angle_5to8[4] = {48, 38, 28, 18};
+    const int STR[2] = {160, 160};
+    // 电机最大速度可以到250
     switch (state) {
-      case 0:
-        // 0,黑线在右，需左转
-        // 其实是黑线在左，需要右转
-        // 极限转弯
-        Motor::turn_ctrl(ave_speed_0to3[0], diff_0to3[0], L * angle_0to3[0], 2);
-        last_status = 0;
-        break;
-      case 1:
-        // 0.5,黑线在右，需左转
-        Motor::turn_ctrl(ave_speed_0to3[1], diff_0to3[1], L * angle_0to3[1], 0);
-        last_status = 1;
-        break;
-      case 2:
-        // 1,黑线在右，需左转
-        Motor::turn_ctrl(ave_speed_0to3[2], diff_0to3[2], L * angle_0to3[2], 0);
-        last_status = 2;
-        break;
-      case 3:
-        // 1.5,黑线在右，需左转
-        Motor::turn_ctrl(ave_speed_0to3[3], diff_0to3[3], L * angle_0to3[3], 0);
-        last_status = 3;
-        break;
-      case 4:
-        // 2,黑线在中
-        Motor::turn_ctrl(STR[0], STR[1], 2, 0);
-        last_status = 4;
-        break;
-      case 5:
-        // 2.5,黑线在左，需右转
-        Motor::turn_ctrl(ave_speed_5to8[3], diff_5to8[3], R * angle_5to8[3], 0);
-        last_status = 5;
-        break;
-      case 6:
-        // 3,黑线在左，需右转
-        Motor::turn_ctrl(ave_speed_5to8[2], diff_5to8[2], R * angle_5to8[2], 0);
-        last_status = 6;
-        break;
-      case 7:
-        // 3.5,黑线在左，需右转
-        Motor::turn_ctrl(ave_speed_5to8[1], diff_5to8[1], R * angle_5to8[1], 0);
-        last_status = 7;
-        break;
-      case 8:
-        // 4,黑线在左，需右转
-        Motor::turn_ctrl(ave_speed_5to8[0], diff_5to8[0], R * angle_5to8[0], 1);
-        last_status = 8;
-        break;
+    case 0:
+      // 0,黑线在左，需右转
+      // 极限转弯，右轮反转
+      Motor::turn_ctrl(Aspeed_0to3[0], Bspeed_0to3[0], R * angle_0to3[0], 2);
+      last_status = 0;
+      break;
+    case 1:
+      // 0.5
+      Motor::turn_ctrl(Aspeed_0to3[1], Bspeed_0to3[1], R * angle_0to3[1], 0);
+      last_status = 1;
+      break;
+    case 2:
+      // 1
+      Motor::turn_ctrl(Aspeed_0to3[2], Bspeed_0to3[2], R * angle_0to3[2], 0);
+      last_status = 2;
+      break;
+    case 3:
+      // 1.5
+      Motor::turn_ctrl(Aspeed_0to3[3], Bspeed_0to3[3], R * angle_0to3[3], 0);
+      last_status = 3;
+      break;
+    case 4:
+      // 2,黑线在中
+      Motor::turn_ctrl(STR[0], STR[1], 2, 0);
+      last_status = 4;
+      break;
+    case 5:
+      // 2.5,黑线在右，需左转
+      Motor::turn_ctrl(Aspeed_5to8[3], Bspeed_5to8[3], L * angle_5to8[3], 0);
+      last_status = 5;
+      break;
+    case 6:
+      // 3,黑线在右，需左转
+      Motor::turn_ctrl(Aspeed_5to8[2], Bspeed_5to8[2], L * angle_5to8[2], 0);
+      last_status = 6;
+      break;
+    case 7:
+      // 3.5,黑线在右，需左转
+      Motor::turn_ctrl(Aspeed_5to8[1], Bspeed_5to8[1], L * angle_5to8[1], 0);
+      last_status = 7;
+      break;
+    case 8:
+      // 4,黑线在右，需左转
+      // 12/25测试后发现极限左转不需要反转
+      Motor::turn_ctrl(Aspeed_5to8[0], Bspeed_5to8[0], L * angle_5to8[0], 0);
+      last_status = 8;
+      break;
     }
   }
 
@@ -249,27 +252,20 @@ public:
     }
   }
 
-  void run_without_tracing() {
-    Motor::straight();
-  }
+  void run_without_tracing() { Motor::straight(); }
 
   void servo_test() {
     const int L = -1;
     const int R = 1;
-    Motor::turn_ctrl(75, 0, L * 25, 0);
+    Motor::turn_ctrl(75, 0, L * 20, 0);
     // 向右转，输入-参数
     delay(1500);
-    Motor::turn_ctrl(75, 0, R * 25, 0);
+    Motor::turn_ctrl(0, 75, R * 20, 0);
     // 向左转，输入+参数
     delay(3000);
   }
 
-  void find_offset() {
-    angle_loop(10);
-  }
+  void find_offset() { angle_loop(10); }
 
-  void motor_direction() {
-    Motor::turn_ctrl(120, 130, 0, 1);
-  }
-
+  void motor_direction() { Motor::turn_ctrl(120, 130, 0, 1); }
 };
