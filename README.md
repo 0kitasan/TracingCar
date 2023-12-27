@@ -17,7 +17,7 @@ classDiagram
         -int sensorReading[5]
         -int sensor_result[5]
         -const int threshod //灰度阈值
-        -void read() 读数
+        -void read() 传感器读数存储
         +float getStatus() 输出状态以判断小车位置
     }
     class Motor{
@@ -32,10 +32,9 @@ classDiagram
         -const int Speed_and_Dir_Param[ ] 
         //小车速度参数，需要重点调整
         +void tracing_adjust(int state) 控制小车转向
-        +void servo_test() 调试舵机，用于找零点\n下面两函数将在ino中被直接调用
-
         +void run_without_tracing() 直线模式
         +void run_with_tracing() 巡线模式
+        +void servo_test() 调试舵机，用于找零点\n下面两函数将在ino中被直接调用
     }
 ```
 
