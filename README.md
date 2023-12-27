@@ -25,10 +25,18 @@ classDiagram
     }
     class Car{
         -int last_status //记录小车上一次位置状态
-        -const int Speed_and_Dir_Parm[ ] \n//小车速度参数，需要重点调整
+        -const int Speed_and_Dir_Parm[ ] 
+        //小车速度参数，需要重点调整
         +void tracing_adjust(int state) 控制小车转向
         +void servo_test() 调试舵机，用于调整其零点
         +void run_without_tracing() 直线模式*
         +void run_with_tracing() 巡线模式
+        <b>方法2()</b>
     }
+```
+
+```mermaid
+graph TD;
+    A[普通文本] --> B[<b>加粗文本</b>]
+    B --> C[普通文本]
 ```
