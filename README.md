@@ -29,7 +29,6 @@ classDiagram
         +void tracing_adjust(int state)控制小车转向
         +void servo_test()调试舵机，用于调整其零点
         +void run_without_tracing()直线模式*
-        **+void run_with_tracing()巡线模式**
-        `test[style="font-family: 'Arial'; font-size: 14px;"]:::label`
+        +void run_with_tracing()巡线模式
     }
 ```
