@@ -83,13 +83,20 @@ graph TD;
 ```mermaid
 graph TD;
     A[run_with_tracing]
-    B[turn_ctrl + tracing_adjust 这里只写左半部分，右半同理]
+    B[turn_ctrl-tracing_adjust]
     C[黑线极左右转需打死]
     D[黑线较左右转幅度需较大]
     E[黑线偏左右转]
     F[黑线稍左稍微右转即可]
     G[黑线在中直行]
     H[处理该种错误情况]
+    A -->B
+    A -->C
+    A -->D
+    A -->E
+    A -->F
+    A -->G
+    A -->H
 ```
 
 
