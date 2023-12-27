@@ -23,7 +23,6 @@ classDiagram
     class Motor{
         -const int PWM_and_Dir
         -const int offset //设置舵机零点
-        
         -void A_and_B_Motor()
         +staright() 直行
         +turn_ctrl() 提供控制舵机和后轮的接口，\n可分别控制两后轮，并提供后轮方向选择
@@ -33,8 +32,8 @@ classDiagram
         -const int Speed_and_Dir_Param[ ] 
         //小车速度参数，需要重点调整
         +void tracing_adjust(int state) 控制小车转向
-        +void servo_test() 调试舵机，用于调整其零点\n//下面两个函数将在ino中被直接调用
-        
+        +void servo_test() 调试舵机，用于找零点\n下面两函数将在ino中被直接调用
+
         +void run_without_tracing() 直线模式
         +void run_with_tracing() 巡线模式
     }
