@@ -11,52 +11,24 @@ classDiagram
     Motor --|> Car
     class Sensor{
         -const int sensor[5]
-        -const int threshod//灰度阈值
-        -void read()读数
-        +float getStatus()输出状态以判断小车位置
-    }
-    class Motor{
-        -const int PWM_and_Dir
-        -const int offset//设置舵机零点
-        
-        -void A_and_B_Motor()
-        +staright()直行
-        +turn_ctrl()提供控制舵机和后轮的接口，\n可分别控制两后轮，并提供后轮方向选择
-    }
-    class Car{
-        -int last_status//记录小车上一次位置状态
-        -const int Speed_and_Dir_Parm[ ]\n//小车速度参数，需要重点调整
-        +void tracing_adjust(int state)控制小车转向
-        +void servo_test()调试舵机，用于调整其零点
-        +void run_without_tracing()直线模式*
-        +void run_with_tracing()巡线模式
-    }
-```
-
-github渲染效果测试
-``` mermaid
-classDiagram
-    Sensor --|> Car
-    Motor --|> Car
-    class Sensor{
-        -const int sensor[5]
-        -const int threshod
-        -void read()
+        -const int threshod //灰度阈值
+        -void read() 读数
         +float getStatus() 输出状态以判断小车位置
     }
     class Motor{
         -const int PWM_and_Dir
-        -const int offset
+        -const int offset //设置舵机零点
+        
         -void A_and_B_Motor()
         +staright() 直行
-        +turn_ctrl()
+        +turn_ctrl() 提供控制舵机和后轮的接口，\n可分别控制两后轮，并提供后轮方向选择
     }
     class Car{
-        -int last_status//记录小车上一次位置状态
-        -const int Speed_and_Dir_Parm[ ]\n//小车速度参数，需要重点调整
-        +void tracing_adjust(int state)控制小车转向
-        +void servo_test()调试舵机，用于调整其零点
-        +void run_without_tracing()直线模式
-        +void run_with_tracing()巡线模式
+        -int last_status //记录小车上一次位置状态
+        -const int Speed_and_Dir_Parm[ ] \n//小车速度参数，需要重点调整
+        +void tracing_adjust(int state) 控制小车转向
+        +void servo_test() 调试舵机，用于调整其零点
+        +void run_without_tracing() 直线模式*
+        +void run_with_tracing() 巡线模式
     }
 ```
