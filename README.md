@@ -32,9 +32,9 @@ classDiagram
         -const int Speed_and_Dir_Param[ ] 
         //小车速度参数，需要重点调整
         +void tracing_adjust(int state) 控制小车转向
+        +void servo_test() 调试舵机，用于标定其零点
         +void run_without_tracing() 直线模式
         +void run_with_tracing() 巡线模式
-        +void servo_test() 调试舵机，用于找零点\n下面两函数将在ino中被直接调用
     }
 ```
 
