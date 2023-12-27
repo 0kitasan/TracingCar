@@ -2,7 +2,7 @@
 class Sensor {
 private:
   const int sensor[5] = {A0, A1, A2, A3, A4};
-  const int threshold = 450;
+  const int threshold = 500;
   int sensorReading[5];
   int flag = 0;
   int sensor_result[5];
@@ -116,22 +116,6 @@ public:
     B_Motor(dir_B, B_speed);
   }
 
-  void angle_loop(float times) {
-    float angle = 0;
-    const float angle_start = 0;
-    const float angle_end = 120;
-    for (int i = 0; i <= times; i++) {
-      angle = angle_start + i * (angle_end - angle_start) / times;
-      servo.write(angle);
-      Serial.print("angle");
-      Serial.print(i);
-      Serial.print("=");
-      Serial.print(angle);
-      Serial.println();
-      delay(500);
-    }
-  }
-
   void turn_ctrl(const int Aspeed, const int Bspeed, const int angle,
                  int mode) {
     servo.write(offset + angle);
@@ -179,9 +163,9 @@ public:
     const int L = 1;
     // 12/25换了新舵机，好像角度不一样
     // A_Motor为右轮，B_Motor为左轮
-    const int Aspeed_0to3[4] = {50, 50, 100, 130};
+    const int Aspeed_0to3[4] = {50, 20, 100, 130};
     const int Bspeed_0to3[4] = {140, 130, 140, 150};
-    const int angle_0to3[4] = {68, 50, 38, 28};
+    const int angle_0to3[4] = {68, 54, 38, 28};
     // 上面是右转，角度需要大一点，但是最大别超过54了，以免损伤舵机
 
     const int Aspeed_5to8[4] = {105, 120, 135, 155};
@@ -264,8 +248,6 @@ public:
     // 向左转，输入+参数
     delay(3000);
   }
-
-  void find_offset() { angle_loop(10); }
 
   void motor_direction() { Motor::turn_ctrl(120, 130, 0, 1); }
 };

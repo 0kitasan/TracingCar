@@ -11,8 +11,6 @@ void loop()
     //car.run_without_tracing();
     car.run_with_tracing();
     //car.motor_direction();
-    //car.find_offset();
     //car.servo_test();
-    //Serial.println("");
-    //delay(5);
+    delay(10);
 }
