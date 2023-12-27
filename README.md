@@ -1,8 +1,11 @@
 # TracingCar
 工程实践课程大作业：巡线小车
+
 由于使用面向对象的方法编写程序，故使用mermaid中的classDiagram构建程序框图。
 请注意，该框图只展示了大致的逻辑，变量和函数名也并非一一对应。
+
 若想具体了解可以直接查看代码(即car.hpp)，内部附有详细注释。
+
 以下是控制程序逻辑框图：
 
 ``` mermaid
@@ -25,14 +28,12 @@ classDiagram
     }
     class Car{
         -int last_status //记录小车上一次位置状态
-        -const int Speed_and_Dir_Parm[ ] 
+        -const int Speed_and_Dir_Param[ ] 
         //小车速度参数，需要重点调整
         +void tracing_adjust(int state) 控制小车转向
         +void servo_test() 调试舵机，用于调整其零点
-        +void run_without_tracing() 直线模式*
-        **+void run_with_tracing() 巡线模式**
-        **+void run_with_tracing()**
-        方法2()*
+        +void run_without_tracing() 直线模式
+        +void run_with_tracing() 巡线模式
     }
 ```
 
