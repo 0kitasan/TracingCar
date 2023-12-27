@@ -32,3 +32,31 @@ classDiagram
         +void run_with_tracing()巡线模式
     }
 ```
+
+github渲染效果测试
+``` mermaid
+classDiagram
+    Sensor --|> Car
+    Motor --|> Car
+    class Sensor{
+        -const int sensor[5]
+        -const int threshod
+        -void read()
+        +float getStatus() 输出状态以判断小车位置
+    }
+    class Motor{
+        -const int PWM_and_Dir
+        -const int offset
+        -void A_and_B_Motor()
+        +staright() 直行
+        +turn_ctrl()
+    }
+    class Car{
+        -int last_status//记录小车上一次位置状态
+        -const int Speed_and_Dir_Parm[ ]\n//小车速度参数，需要重点调整
+        +void tracing_adjust(int state)控制小车转向
+        +void servo_test()调试舵机，用于调整其零点
+        +void run_without_tracing()直线模式
+        +void run_with_tracing()巡线模式
+    }
+```
