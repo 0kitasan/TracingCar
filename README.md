@@ -34,6 +34,7 @@ classDiagram
         //小车速度参数，需要重点调整
         +void tracing_adjust(int state) 控制小车转向
         +void servo_test() 调试舵机，用于调整其零点\n//下面两个函数将在ino中被直接调用
+        
         +void run_without_tracing() 直线模式
         +void run_with_tracing() 巡线模式
     }
@@ -44,7 +45,7 @@ classDiagram
 graph TD;
     A[run_with_tracing]
     B[getStatus]
-    I[turn_ctrl+tracing_adjust]
+    I[tracing_adjust+turn_ctrl]
     C[黑线极左\n右转需打死]
     D[黑线较左\n右转幅度需较大]
     E[黑线偏左\n右转]
